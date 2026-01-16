@@ -1,0 +1,17 @@
+{
+  "name": "hal-sdl",
+  "version": "0.1.0",
+  "description": "SDL HAL drivers for Open Control (display, input simulation)",
+  "keywords": ["open-control", "sdl", "hal", "desktop", "simulator"],
+  "license": "MIT",
+  "platforms": ["native"],
+  "dependencies": {
+    "framework": "*"
+  },
+  "build": {
+    "includeDir": "src",
+    "srcFilter": [
+      "+<**/*.cpp>"
+    ]
+  }
+}
