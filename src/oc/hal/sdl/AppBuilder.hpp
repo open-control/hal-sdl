@@ -31,7 +31,7 @@
 #include <oc/app/AppBuilder.hpp>
 #include <oc/app/OpenControlApp.hpp>
 #include <oc/hal/IMidiTransport.hpp>
-#include <oc/hal/IMessageTransport.hpp>
+#include <oc/hal/IFrameTransport.hpp>
 #include <oc/hal/NullMidiTransport.hpp>
 #include "SdlOutput.hpp"
 #include "SdlButtonController.hpp"
@@ -117,13 +117,13 @@ public:
     /**
      * @brief Add remote message transport
      *
-     * Inject any IMessageTransport implementation for communication with
+     * Inject any IFrameTransport implementation for communication with
      * remote systems (e.g., oc-bridge via UDP, WebSocket, etc.)
      *
      * @param transport Message transport implementation
      * @return Reference to this builder for chaining
      */
-    AppBuilder& remote(std::unique_ptr<IMessageTransport> transport) {
+    AppBuilder& remote(std::unique_ptr<IFrameTransport> transport) {
         remoteTransport_ = std::move(transport);
         return *this;
     }
@@ -203,7 +203,7 @@ public:
 
 private:
     app::AppBuilder builder_;
-    std::unique_ptr<IMessageTransport> remoteTransport_;
+    std::unique_ptr<IFrameTransport> remoteTransport_;
 };
 
 }  // namespace oc::hal::sdl
