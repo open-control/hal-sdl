@@ -1,7 +1,8 @@
 #pragma once
 
 #include <SDL.h>
-#include <oc/hal/Types.hpp>
+#include <oc/types/Ids.hpp>
+#include <oc/types/Callbacks.hpp>
 #include <cassert>
 #include <vector>
 #include <functional>
@@ -14,8 +15,8 @@ class SdlButtonController;
 class SdlEncoderController;
 
 // Feedback callbacks for visual sync (e.g., HwSimulator)
-using ButtonFeedback = std::function<void(hal::ButtonID, bool pressed)>;
-using EncoderFeedback = std::function<void(hal::EncoderID, float value)>;
+using ButtonFeedback = std::function<void(oc::ButtonID, bool pressed)>;
+using EncoderFeedback = std::function<void(oc::EncoderID, float value)>;
 
 /**
  * @brief Maps SDL input events to HAL button/encoder events
@@ -53,20 +54,20 @@ public:
     // Keyboard -> Buttons
     // ══════════════════════════════════════════════════════════════
 
-    InputMapper& button(SDL_Keycode key, hal::ButtonID id);
+    InputMapper& button(SDL_Keycode key, oc::ButtonID id);
 
     // ══════════════════════════════════════════════════════════════
     // Keyboard -> Encoders (two keys incr/decr)
     // ══════════════════════════════════════════════════════════════
 
     InputMapper& encoder(SDL_Keycode keyIncr, SDL_Keycode keyDecr,
-                         hal::EncoderID id, float delta = 0.05f);
+                         oc::EncoderID id, float delta = 0.05f);
 
     // ══════════════════════════════════════════════════════════════
     // Mouse -> Buttons (clickable zones)
     // ══════════════════════════════════════════════════════════════
 
-    InputMapper& buttonCircle(int cx, int cy, int radius, hal::ButtonID id);
+    InputMapper& buttonCircle(int cx, int cy, int radius, oc::ButtonID id);
 
     // ══════════════════════════════════════════════════════════════
     // Mouse -> Encoders (vertical drag zones)
@@ -74,15 +75,15 @@ public:
 
     /// Ring zone (hole in center for button)
     InputMapper& encoderRing(int cx, int cy, int outerRadius, int innerRadius,
-                             hal::EncoderID id, float sensitivity = 100.0f);
+                             oc::EncoderID id, float sensitivity = 100.0f);
 
     /// Full circle zone
     InputMapper& encoderCircle(int cx, int cy, int radius,
-                               hal::EncoderID id, float sensitivity = 100.0f);
+                               oc::EncoderID id, float sensitivity = 100.0f);
 
     /// Mouse wheel on zone
     InputMapper& encoderWheel(int cx, int cy, int radius,
-                              hal::EncoderID id, float delta = 0.02f);
+                              oc::EncoderID id, float delta = 0.02f);
 
     // ══════════════════════════════════════════════════════════════
     // Combo: Encoder + Integrated Button (for macros)
@@ -90,15 +91,15 @@ public:
 
     InputMapper& encoderWithButton(int cx, int cy,
                                    int outerRadius, int innerRadius,
-                                   hal::EncoderID encId, hal::ButtonID btnId,
+                                   oc::EncoderID encId, oc::ButtonID btnId,
                                    float sensitivity = 100.0f);
 
     // ══════════════════════════════════════════════════════════════
     // External injection (for custom sources)
     // ══════════════════════════════════════════════════════════════
 
-    void post(hal::ButtonID id, bool pressed);
-    void post(hal::EncoderID id, float delta);
+    void post(oc::ButtonID id, bool pressed);
+    void post(oc::EncoderID id, float delta);
 
     // ══════════════════════════════════════════════════════════════
     // Connection to controllers
@@ -142,12 +143,12 @@ public:
 
 private:
     // Mapping structures
-    struct KeyButtonMap { SDL_Keycode key; hal::ButtonID id; };
-    struct KeyEncoderMap { SDL_Keycode keyIncr; SDL_Keycode keyDecr; hal::EncoderID id; float delta; };
-    struct CircleButtonMap { int cx, cy, radius; hal::ButtonID id; };
-    struct RingEncoderMap { int cx, cy, outerR, innerR; hal::EncoderID id; float sensitivity; };
-    struct WheelEncoderMap { int cx, cy, radius; hal::EncoderID id; float delta; };
-    struct ComboMap { int cx, cy, outerR, innerR; hal::EncoderID encId; hal::ButtonID btnId; float sensitivity; };
+    struct KeyButtonMap { SDL_Keycode key; oc::ButtonID id; };
+    struct KeyEncoderMap { SDL_Keycode keyIncr; SDL_Keycode keyDecr; oc::EncoderID id; float delta; };
+    struct CircleButtonMap { int cx, cy, radius; oc::ButtonID id; };
+    struct RingEncoderMap { int cx, cy, outerR, innerR; oc::EncoderID id; float sensitivity; };
+    struct WheelEncoderMap { int cx, cy, radius; oc::EncoderID id; float delta; };
+    struct ComboMap { int cx, cy, outerR, innerR; oc::EncoderID encId; oc::ButtonID btnId; float sensitivity; };
 
     std::vector<KeyButtonMap> keyButtons_;
     std::vector<KeyEncoderMap> keyEncoders_;
@@ -165,7 +166,7 @@ private:
     // Drag state
     struct DragState {
         bool active = false;
-        hal::EncoderID encoderId = 0;
+        oc::EncoderID encoderId = 0;
         int startY = 0;
         float sensitivity = 100.0f;
     } drag_;
@@ -184,8 +185,8 @@ private:
         return distSq <= (outerR * outerR) && distSq >= (innerR * innerR);
     }
 
-    void emitButton(hal::ButtonID id, bool pressed);
-    void emitEncoder(hal::EncoderID id, float delta);
+    void emitButton(oc::ButtonID id, bool pressed);
+    void emitEncoder(oc::EncoderID id, float delta);
 };
 
 } // namespace oc::hal::sdl

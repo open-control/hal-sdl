@@ -1,8 +1,8 @@
 #pragma once
 
-#include <oc/hal/IEncoderController.hpp>
+#include <oc/interface/IEncoder.hpp>
 #include <oc/core/input/EncoderLogic.hpp>
-#include <oc/core/Result.hpp>
+#include <oc/types/Result.hpp>
 #include <unordered_map>
 #include <memory>
 #include <cmath>
@@ -22,10 +22,10 @@ namespace oc::hal::sdl {
  *
  * The logic layer is identical, only the input source differs.
  */
-class SdlEncoderController : public hal::IEncoderController {
+class SdlEncoderController : public interface::IEncoder {
 public:
-    core::Result<void> init() override {
-        return core::Result<void>::ok();
+    oc::Result<void> init() override {
+        return oc::Result<void>::ok();
     }
 
     void update() override {
@@ -38,36 +38,36 @@ public:
         }
     }
 
-    float getPosition(hal::EncoderID id) const override {
+    float getPosition(oc::EncoderID id) const override {
         auto it = logics_.find(id);
         return it != logics_.end() ? it->second->getLastValue() : 0.0f;
     }
 
-    void setPosition(hal::EncoderID id, float value) override {
+    void setPosition(oc::EncoderID id, float value) override {
         ensureLogic(id)->setPosition(value);
     }
 
-    void setMode(hal::EncoderID id, hal::EncoderMode mode) override {
+    void setMode(oc::EncoderID id, interface::EncoderMode mode) override {
         ensureLogic(id)->setMode(mode);
     }
 
-    void setBounds(hal::EncoderID id, float min, float max) override {
+    void setBounds(oc::EncoderID id, float min, float max) override {
         ensureLogic(id)->setBounds(min, max);
     }
 
-    void setDelta(hal::EncoderID id, float delta) override {
+    void setDelta(oc::EncoderID id, float delta) override {
         ensureLogic(id)->setDelta(delta);
     }
 
-    void setDiscreteSteps(hal::EncoderID id, uint8_t steps) override {
+    void setDiscreteSteps(oc::EncoderID id, uint8_t steps) override {
         ensureLogic(id)->setDiscreteSteps(steps);
     }
 
-    void setContinuous(hal::EncoderID id) override {
+    void setContinuous(oc::EncoderID id) override {
         ensureLogic(id)->setContinuous();
     }
 
-    void setCallback(hal::EncoderCallback cb) override {
+    void setCallback(oc::EncoderCallback cb) override {
         callback_ = cb;
     }
 
@@ -81,7 +81,7 @@ public:
      * EncoderLogic's NORMALIZED mode expects ±1 ticks, so we call
      * processDelta multiple times for larger deltas (like mouse drag).
      */
-    void onEvent(hal::EncoderID id, float delta) {
+    void onEvent(oc::EncoderID id, float delta) {
         // Convert float delta to ticks
         // Scale: 0.01 delta = 1 tick (100 pixels of mouse movement = full range)
         constexpr float SCALE = 100.0f;
@@ -101,8 +101,8 @@ public:
     }
 
 private:
-    hal::EncoderCallback callback_;
-    mutable std::unordered_map<hal::EncoderID, std::unique_ptr<core::input::EncoderLogic>> logics_;
+    oc::EncoderCallback callback_;
+    mutable std::unordered_map<oc::EncoderID, std::unique_ptr<core::input::EncoderLogic>> logics_;
 
     /**
      * @brief Get or create EncoderLogic for an ID
@@ -111,7 +111,7 @@ private:
      * This allows the controller to handle any encoder ID without
      * pre-registration (unlike Teensy which has fixed hardware).
      */
-    core::input::EncoderLogic* ensureLogic(hal::EncoderID id) const {
+    core::input::EncoderLogic* ensureLogic(oc::EncoderID id) const {
         auto it = logics_.find(id);
         if (it != logics_.end()) {
             return it->second.get();

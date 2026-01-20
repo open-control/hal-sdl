@@ -8,44 +8,44 @@ namespace oc::hal::sdl {
 // Configuration API (fluent)
 // ══════════════════════════════════════════════════════════════════════════════
 
-InputMapper& InputMapper::button(SDL_Keycode key, hal::ButtonID id) {
+InputMapper& InputMapper::button(SDL_Keycode key, oc::ButtonID id) {
     keyButtons_.push_back({key, id});
     return *this;
 }
 
 InputMapper& InputMapper::encoder(SDL_Keycode keyIncr, SDL_Keycode keyDecr,
-                                   hal::EncoderID id, float delta) {
+                                   oc::EncoderID id, float delta) {
     keyEncoders_.push_back({keyIncr, keyDecr, id, delta});
     return *this;
 }
 
-InputMapper& InputMapper::buttonCircle(int cx, int cy, int radius, hal::ButtonID id) {
+InputMapper& InputMapper::buttonCircle(int cx, int cy, int radius, oc::ButtonID id) {
     circleButtons_.push_back({cx, cy, radius, id});
     return *this;
 }
 
 InputMapper& InputMapper::encoderRing(int cx, int cy, int outerRadius, int innerRadius,
-                                       hal::EncoderID id, float sensitivity) {
+                                       oc::EncoderID id, float sensitivity) {
     ringEncoders_.push_back({cx, cy, outerRadius, innerRadius, id, sensitivity});
     return *this;
 }
 
 InputMapper& InputMapper::encoderCircle(int cx, int cy, int radius,
-                                         hal::EncoderID id, float sensitivity) {
+                                         oc::EncoderID id, float sensitivity) {
     // Circle is just a ring with innerR = 0
     ringEncoders_.push_back({cx, cy, radius, 0, id, sensitivity});
     return *this;
 }
 
 InputMapper& InputMapper::encoderWheel(int cx, int cy, int radius,
-                                        hal::EncoderID id, float delta) {
+                                        oc::EncoderID id, float delta) {
     wheelEncoders_.push_back({cx, cy, radius, id, delta});
     return *this;
 }
 
 InputMapper& InputMapper::encoderWithButton(int cx, int cy,
                                              int outerRadius, int innerRadius,
-                                             hal::EncoderID encId, hal::ButtonID btnId,
+                                             oc::EncoderID encId, oc::ButtonID btnId,
                                              float sensitivity) {
     combos_.push_back({cx, cy, outerRadius, innerRadius, encId, btnId, sensitivity});
     return *this;
@@ -64,11 +64,11 @@ void InputMapper::connect(SdlButtonController& buttons, SdlEncoderController& en
 // External injection
 // ══════════════════════════════════════════════════════════════════════════════
 
-void InputMapper::post(hal::ButtonID id, bool pressed) {
+void InputMapper::post(oc::ButtonID id, bool pressed) {
     emitButton(id, pressed);
 }
 
-void InputMapper::post(hal::EncoderID id, float delta) {
+void InputMapper::post(oc::EncoderID id, float delta) {
     emitEncoder(id, delta);
 }
 
@@ -76,7 +76,7 @@ void InputMapper::post(hal::EncoderID id, float delta) {
 // Emission helpers
 // ══════════════════════════════════════════════════════════════════════════════
 
-void InputMapper::emitButton(hal::ButtonID id, bool pressed) {
+void InputMapper::emitButton(oc::ButtonID id, bool pressed) {
     if (buttonController_) {
         buttonController_->onEvent(id, pressed);
     }
@@ -85,7 +85,7 @@ void InputMapper::emitButton(hal::ButtonID id, bool pressed) {
     }
 }
 
-void InputMapper::emitEncoder(hal::EncoderID id, float delta) {
+void InputMapper::emitEncoder(oc::EncoderID id, float delta) {
     if (encoderController_) {
         encoderController_->onEvent(id, delta);
     }

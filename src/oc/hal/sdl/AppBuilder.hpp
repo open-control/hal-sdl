@@ -30,9 +30,9 @@
 
 #include <oc/app/AppBuilder.hpp>
 #include <oc/app/OpenControlApp.hpp>
-#include <oc/hal/IMidiTransport.hpp>
-#include <oc/hal/IFrameTransport.hpp>
-#include <oc/hal/NullMidiTransport.hpp>
+#include <oc/interface/IMidi.hpp>
+#include <oc/interface/ITransport.hpp>
+#include <oc/impl/NullMidi.hpp>
 #include "SdlOutput.hpp"
 #include "SdlButtonController.hpp"
 #include "SdlEncoderController.hpp"
@@ -88,24 +88,24 @@ public:
      * @brief Add no-op MIDI transport
      *
      * Enables contexts that require MidiAPI to work without real MIDI hardware.
-     * Uses oc::hal::NullMidiTransport from framework.
+     * Uses oc::impl::NullMidi from framework.
      *
      * @return Reference to this builder for chaining
      */
     AppBuilder& midi() {
-        builder_.midi(std::make_unique<hal::NullMidiTransport>());
+        builder_.midi(std::make_unique<impl::NullMidi>());
         return *this;
     }
 
     /**
      * @brief Add MIDI transport
      *
-     * Inject any IMidiTransport implementation (LibreMidiTransport, mock, etc.)
+     * Inject any IMidi implementation (LibreMidiTransport, mock, etc.)
      *
      * @param transport MIDI transport implementation
      * @return Reference to this builder for chaining
      */
-    AppBuilder& midi(std::unique_ptr<IMidiTransport> transport) {
+    AppBuilder& midi(std::unique_ptr<interface::IMidi> transport) {
         builder_.midi(std::move(transport));
         return *this;
     }
@@ -117,13 +117,13 @@ public:
     /**
      * @brief Add remote message transport
      *
-     * Inject any IFrameTransport implementation for communication with
+     * Inject any ITransport implementation for communication with
      * remote systems (e.g., oc-bridge via UDP, WebSocket, etc.)
      *
      * @param transport Message transport implementation
      * @return Reference to this builder for chaining
      */
-    AppBuilder& remote(std::unique_ptr<IFrameTransport> transport) {
+    AppBuilder& remote(std::unique_ptr<interface::ITransport> transport) {
         remoteTransport_ = std::move(transport);
         return *this;
     }
@@ -173,7 +173,7 @@ public:
      * @param config Input timing configuration (long press, double tap thresholds)
      * @return Reference to this builder for chaining
      */
-    AppBuilder& inputConfig(const core::InputConfig& config) {
+    AppBuilder& inputConfig(const core::input::InputConfig& config) {
         builder_.inputConfig(config);
         return *this;
     }
@@ -203,7 +203,7 @@ public:
 
 private:
     app::AppBuilder builder_;
-    std::unique_ptr<IFrameTransport> remoteTransport_;
+    std::unique_ptr<interface::ITransport> remoteTransport_;
 };
 
 }  // namespace oc::hal::sdl

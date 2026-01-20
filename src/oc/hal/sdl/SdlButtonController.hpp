@@ -1,33 +1,33 @@
 #pragma once
 
-#include <oc/hal/IButtonController.hpp>
-#include <oc/core/Result.hpp>
+#include <oc/interface/IButton.hpp>
+#include <oc/types/Result.hpp>
 #include <unordered_map>
 
 namespace oc::hal::sdl {
 
 /**
- * @brief SDL button controller implementing IButtonController
+ * @brief SDL button controller implementing IButton
  *
  * Event-driven controller for desktop simulation. Button events are
  * injected via onEvent() from InputMapper, not polled from hardware.
  */
-class SdlButtonController : public hal::IButtonController {
+class SdlButtonController : public interface::IButton {
 public:
-    core::Result<void> init() override {
-        return core::Result<void>::ok();
+    oc::Result<void> init() override {
+        return oc::Result<void>::ok();
     }
 
     void update(uint32_t) override {
         // No-op: SDL is event-driven, not polled
     }
 
-    bool isPressed(hal::ButtonID id) const override {
+    bool isPressed(oc::ButtonID id) const override {
         auto it = states_.find(id);
         return it != states_.end() && it->second;
     }
 
-    void setCallback(hal::ButtonCallback cb) override {
+    void setCallback(oc::ButtonCallback cb) override {
         callback_ = cb;
     }
 
@@ -37,16 +37,16 @@ public:
      * @param id Button identifier
      * @param pressed true if pressed, false if released
      */
-    void onEvent(hal::ButtonID id, bool pressed) {
+    void onEvent(oc::ButtonID id, bool pressed) {
         states_[id] = pressed;
         if (callback_) {
-            callback_(id, pressed ? hal::ButtonEvent::PRESSED : hal::ButtonEvent::RELEASED);
+            callback_(id, pressed ? oc::ButtonEvent::PRESSED : oc::ButtonEvent::RELEASED);
         }
     }
 
 private:
-    hal::ButtonCallback callback_;
-    std::unordered_map<hal::ButtonID, bool> states_;
+    oc::ButtonCallback callback_;
+    std::unordered_map<oc::ButtonID, bool> states_;
 };
 
 } // namespace oc::hal::sdl
