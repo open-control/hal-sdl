@@ -1,8 +1,8 @@
 #pragma once
 
 #include <SDL.h>
-#include <oc/types/Ids.hpp>
-#include <oc/types/Callbacks.hpp>
+#include <oc/type/Ids.hpp>
+#include <oc/type/Callbacks.hpp>
 #include <oc/time/Time.hpp>
 
 namespace oc::hal::sdl {
