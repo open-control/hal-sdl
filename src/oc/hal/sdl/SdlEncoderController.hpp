@@ -63,6 +63,14 @@ public:
         ensureLogic(id)->setDiscreteSteps(steps);
     }
 
+    void setDiscreteTicksPerStep(oc::type::EncoderID id, uint16_t ticksPerStep) override {
+        ensureLogic(id)->setDiscreteTicksPerStep(ticksPerStep);
+    }
+
+    void setNormalizedTurns(oc::type::EncoderID id, float turns) override {
+        ensureLogic(id)->setNormalizedTurns(turns);
+    }
+
     void setContinuous(oc::type::EncoderID id) override {
         ensureLogic(id)->setContinuous();
     }
