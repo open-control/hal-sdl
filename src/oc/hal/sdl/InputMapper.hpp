@@ -55,6 +55,7 @@ public:
     // ══════════════════════════════════════════════════════════════
 
     InputMapper& button(SDL_Keycode key, oc::type::ButtonID id);
+    InputMapper& buttonScancode(SDL_Scancode scancode, oc::type::ButtonID id);
 
     // ══════════════════════════════════════════════════════════════
     // Keyboard -> Encoders (two keys incr/decr)
@@ -143,7 +144,11 @@ public:
 
 private:
     // Mapping structures
-    struct KeyButtonMap { SDL_Keycode key; oc::type::ButtonID id; };
+    struct KeyButtonMap {
+        SDL_Keycode key = SDLK_UNKNOWN;
+        SDL_Scancode scancode = SDL_SCANCODE_UNKNOWN;
+        oc::type::ButtonID id = 0;
+    };
     struct KeyEncoderMap { SDL_Keycode keyIncr; SDL_Keycode keyDecr; oc::type::EncoderID id; float delta; };
     struct CircleButtonMap { int cx, cy, radius; oc::type::ButtonID id; };
     struct RingEncoderMap { int cx, cy, outerR, innerR; oc::type::EncoderID id; float sensitivity; };

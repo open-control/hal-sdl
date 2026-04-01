@@ -9,7 +9,12 @@ namespace oc::hal::sdl {
 // ══════════════════════════════════════════════════════════════════════════════
 
 InputMapper& InputMapper::button(SDL_Keycode key, oc::type::ButtonID id) {
-    keyButtons_.push_back({key, id});
+    keyButtons_.push_back({.key = key, .id = id});
+    return *this;
+}
+
+InputMapper& InputMapper::buttonScancode(SDL_Scancode scancode, oc::type::ButtonID id) {
+    keyButtons_.push_back({.scancode = scancode, .id = id});
     return *this;
 }
 
@@ -108,11 +113,18 @@ void InputMapper::handleEvent(const SDL_Event& event) {
         case SDL_KEYDOWN:
         case SDL_KEYUP: {
             bool pressed = (event.type == SDL_KEYDOWN);
+            if (pressed && event.key.repeat != 0) {
+                break;
+            }
             SDL_Keycode key = event.key.keysym.sym;
+            SDL_Scancode scancode = event.key.keysym.scancode;
 
             // Check key -> button mappings
             for (const auto& map : keyButtons_) {
-                if (map.key == key) {
+                const bool matchesKey = map.key != SDLK_UNKNOWN && map.key == key;
+                const bool matchesScancode =
+                    map.scancode != SDL_SCANCODE_UNKNOWN && map.scancode == scancode;
+                if (matchesKey || matchesScancode) {
                     emitButton(map.id, pressed);
                 }
             }
