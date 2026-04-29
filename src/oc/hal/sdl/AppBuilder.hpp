@@ -178,6 +178,18 @@ public:
         return *this;
     }
 
+    /**
+     * @brief Install an optional input binding trace callback.
+     *
+     * The callback is owned by the framework InputBinding and receives
+     * candidate/dispatch decisions after all scopes, predicates, and authority
+     * rules are evaluated.
+     */
+    AppBuilder& inputTrace(core::input::InputBindingTraceCallback callback) {
+        builder_.inputTrace(std::move(callback));
+        return *this;
+    }
+
     // ═══════════════════════════════════════════════════════════════════
     // BUILD
     // ═══════════════════════════════════════════════════════════════════
