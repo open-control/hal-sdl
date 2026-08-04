@@ -1,0 +1,7 @@
+set(OC_HAL_SDL_SOURCE_PATHS
+    src/oc/hal/sdl/InputMapper.cpp
+)
+
+set(OC_HAL_SDL_SOURCES ${OC_HAL_SDL_SOURCE_PATHS})
+list(TRANSFORM OC_HAL_SDL_SOURCES
+    PREPEND "${CMAKE_CURRENT_LIST_DIR}/../")
