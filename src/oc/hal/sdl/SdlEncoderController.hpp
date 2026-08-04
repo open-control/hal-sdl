@@ -5,7 +5,6 @@
 #include <oc/type/Result.hpp>
 #include <unordered_map>
 #include <memory>
-#include <cmath>
 
 namespace oc::hal::sdl {
 
@@ -17,8 +16,8 @@ namespace oc::hal::sdl {
  *
  * ## Difference with Teensy
  *
- * - Teensy: Hardware interrupts -> EncoderLogic::processDelta()
- * - SDL: InputMapper events -> onEvent() -> EncoderLogic::processDelta()
+ * - Teensy: Hardware interrupts publish; update() consumes in foreground.
+ * - SDL: InputMapper events publish and consume synchronously in foreground.
  *
  * The logic layer is identical, only the input source differs.
  */
@@ -29,13 +28,7 @@ public:
     }
 
     void update() override {
-        // Flush pending values from all encoders
-        for (auto& [id, logic] : logics_) {
-            auto pending = logic->flush();
-            if (pending.has_value() && callback_) {
-                callback_(id, pending.value());
-            }
-        }
+        // SDL is event-driven and consumes encoder input in onEvent().
     }
 
     float getPosition(oc::type::EncoderID id) const override {
@@ -83,11 +76,11 @@ public:
      * @brief Called by InputMapper when an encoder event occurs
      *
      * @param id Encoder ID
-     * @param delta Raw delta from input (will be processed by EncoderLogic)
+     * @param delta Raw delta from input
      *
-     * The delta is converted to individual ticks for EncoderLogic.
-     * EncoderLogic's NORMALIZED mode expects ±1 ticks, so we call
-     * processDelta multiple times for larger deltas (like mouse drag).
+     * The event is already in foreground. Publish its aggregate integer ticks,
+     * consume policy immediately, and callback once so InputMapper's following
+     * getPosition() observes the current value.
      */
     void onEvent(oc::type::EncoderID id, float delta) {
         // Convert float delta to ticks
@@ -97,14 +90,11 @@ public:
 
         if (ticks == 0) return;
 
-        // Process each tick individually for correct NORMALIZED mode behavior
-        // This ensures mouse drag feels proportional to movement distance
         auto* logic = ensureLogic(id);
-        int32_t step = (ticks > 0) ? 1 : -1;
-        int32_t count = std::abs(ticks);
-
-        for (int32_t i = 0; i < count; ++i) {
-            logic->processDelta(step);
+        logic->publishDeltaFromISR(ticks);
+        auto value = logic->consumePublishedDeltas();
+        if (value.has_value() && callback_) {
+            callback_(id, value.value());
         }
     }
 
