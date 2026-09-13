@@ -52,6 +52,10 @@ public:
         ensureLogic(id)->setDelta(delta);
     }
 
+    void configureResolution(oc::type::EncoderID id, uint8_t steps, uint16_t ticksPerStep, float turns) override {
+        ensureLogic(id)->configureResolution(steps, ticksPerStep, turns);
+    }
+
     void setDiscreteSteps(oc::type::EncoderID id, uint8_t steps) override {
         ensureLogic(id)->setDiscreteSteps(steps);
     }
